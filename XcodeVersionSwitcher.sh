@@ -31,6 +31,10 @@ HEADER_TPUT=6
 DEFAULT_TPUT=2
 ERR_TPUT=1
 PROMPT_TPUT=3
+HAS_XCODE=false
+HAS_XCODE_BETA=false
+HAS_XCODE_VERSIONS=false
+
 
 init() {
     if [ ${NUM_RUNS} -eq 0 ]; then
@@ -40,17 +44,8 @@ init() {
         tput sgr0
     fi
 
-    # check for both original and beta Xcode applications at the default path
-    #tput setaf $DEFAULT_TPUT
-    #echo ">>> Scanning drive for Xcode applications..."
-    
-    #if [ -f "${DEFAULT_XCODE_APP}" ] && [ -f "${DEFAULT_XCODE_BETA_APP}" ]; then
-    #    echo ">>> User \"$USER\" has the required applications" 
-    #else
-    #    USR_ERR=">>> User \"$USER\" does not have the required \"${XCODE_TITLE}\" and \""${XCODE_BETA_TITLE}"\"  applications installed on the current drive"
-    #    prompt_usr_err
-    #    return
-    #fi
+    # Check for both original and beta Xcode applications at the default path
+    scan_drive_for_xcode_versions
 
     # print current versions to console so it is clear which one they are using
     disp_enabled_xcode_version
@@ -95,6 +90,33 @@ init() {
             prompt_usr_err
         fi
     done
+}
+
+scan_drive_for_xcode_versions() {
+    tput setaf $DEFAULT_TPUT
+    echo ">>> Scanning drive for Xcode installations..."
+    
+    if [ -d ${DEFAULT_XCODE_APP} ] && [ -d ${DEFAULT_XCODE_BETA_APP} ]; then
+        HAS_XCODE=true
+        HAS_XCODE_BETA=true
+        HAS_XCODE_VERSIONS=true
+        echo ">>> Both \""${XCODE_TITLE}"\" and \""${XCODE_BETA_TITLE}"\" were found on this computer"
+        echo ">>> Continuing execution"
+        return
+    elif [ -d ${DEFAULT_XCODE_APP} ]; then
+        HAS_XCODE=true
+        HAS_XCODE_BETA=false
+        HAS_XCODE_VERSIONS=false
+        USR_ERR=">>> The required Xcode beta was not found on this computer"
+    elif [ -d ${DEFAULT_XCODE_BETA_APP} ]; then
+        HAS_XCODE=false
+        HAS_XCODE_BETA=true
+        HAS_XCODE_VERSIONS=false
+        USR_ERR">>> The required standard (non-beta) installation of Xcode was not found on this computer"
+    fi
+
+    EXECUTE_CMD=false
+    prompt_usr_err  # shows error and exits execution due to missing required software
 }
 
 disp_enabled_xcode_version() {
@@ -234,9 +256,9 @@ enable_xcode_version() {
     tput sgr0
 
     if [ ${USE_BETA} == true ]; then
-        sudo $USER xcode-select -s /Applications/Xcode-beta.app/Contents/Developer
+        sudo xcode-select -s /Applications/Xcode-beta.app/Contents/Developer
     else
-        sudo $USER xcode-select -s /Applications/Xcode.app/Contents/Developer
+        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
     fi
 
     tput setaf $HEADER_TPUT
