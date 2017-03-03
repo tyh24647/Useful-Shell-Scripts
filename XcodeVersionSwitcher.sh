@@ -25,8 +25,8 @@ UP_KEY="\027[A"
 DOWN_KEY="\027[B"
 LEFT_KEY="\027[D"
 RIGHT_KEY="\027[C"
-DEFAULT_XCODE_APP="/Applications/Xcode.app/Contents/Developer"
-DEFAULT_XCODE_BETA_APP="/Applications/Xcode-beta.app/Contents/Developer"
+DEFAULT_XCODE_APP="/Applications/Xcode.app"
+DEFAULT_XCODE_BETA_APP="/Applications/Xcode-beta.app"
 HEADER_TPUT=6
 DEFAULT_TPUT=2
 ERR_TPUT=1
@@ -41,16 +41,16 @@ init() {
     fi
 
     # check for both original and beta Xcode applications at the default path
-    tput setaf $DEFAULT_TPUT
-    echo ">>> Scanning drive for Xcode applications..."
+    #tput setaf $DEFAULT_TPUT
+    #echo ">>> Scanning drive for Xcode applications..."
     
-    if [ -f "${DEFAULT_XCODE_APP}" ] && [ -f "${DEFAULT_XCODE_BETA_APP}" ]; then
-        echo ">>> User \"$USER\" has the required applications" 
-    else
-        USR_ERR=">>> User \"$USER\" does not have the required \"${XCODE_TITLE}\" and \""${XCODE_BETA_TITLE}"\"  applications installed on the current drive"
-        prompt_usr_err
-        return
-    fi
+    #if [ -f "${DEFAULT_XCODE_APP}" ] && [ -f "${DEFAULT_XCODE_BETA_APP}" ]; then
+    #    echo ">>> User \"$USER\" has the required applications" 
+    #else
+    #    USR_ERR=">>> User \"$USER\" does not have the required \"${XCODE_TITLE}\" and \""${XCODE_BETA_TITLE}"\"  applications installed on the current drive"
+    #    prompt_usr_err
+    #    return
+    #fi
 
     # print current versions to console so it is clear which one they are using
     disp_enabled_xcode_version
@@ -229,8 +229,7 @@ enable_xcode_version() {
     echo ">>> This command may need root/administrative privelages in order to be executed..."
 
     # check for admin permisisons
-    sudo -v
-
+    tput setaf $DEFAULT_TPUT
     echo ">>> Attempting to enable \""${USR_XCODE_TITLE}"\"... "
     tput sgr0
 
