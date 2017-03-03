@@ -262,6 +262,7 @@ trap_ctrlc() {
 }
 
 clean_stdin() {
+    TMP=""
     #while [ read -r -t 0 ]; do
     #    read -n 256 -r -s
     #done
