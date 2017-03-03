@@ -27,20 +27,23 @@ LEFT_KEY="\027[D"
 RIGHT_KEY="\027[C"
 DEFAULT_XCODE_APP="/Applications/Xcode.app/Contents/Developer"
 DEFAULT_XCODE_BETA_APP="/Applications/Xcode-beta.app/Contents/Developer"
+HEADER_TPUT=6
+DEFAULT_TPUT=2
+ERR_TPUT=1
+PROMPT_TPUT=3
 
-main() {
+init() {
     if [ ${NUM_RUNS} -eq 0 ]; then
         clear
-        tput setaf 6
+        tput setaf $HEADER_TPUT
         echo ">>>  XCODE VERSION SELECTOR"
         tput sgr0
     fi
 
     # check for both original and beta Xcode applications at the default path
-    tput setaf 2
+    tput setaf $DEFAULT_TPUT
     echo ">>> Scanning drive for Xcode applications..."
-    tput sgr0
-    tput setaf 2
+    
     if [ -f "${DEFAULT_XCODE_APP}" ] && [ -f "${DEFAULT_XCODE_BETA_APP}" ]; then
         echo ">>> User \"$USER\" has the required applications" 
     else
@@ -54,7 +57,7 @@ main() {
 
     if [ ${NUM_RUNS} -ne 0 ]; then
         while [ ${INVALID_CONT_OPTION} == true ]; do
-            tput setaf 3
+            tput setaf $PROMPT_TPUT
             read -rp '>>> Continue? (y/n): ' -n 1 key
             tput sgr0
             echo ""
@@ -72,15 +75,15 @@ main() {
                 INVALID_CONT_OPTION=true
             fi
 
-            tput setaf 2
+            tput setaf $DEFAULT_TPUT
         done
     fi
 
     while [ ${EXECUTE_CMD} == true ]; do
         NUM_RUNS=1
-        tput setaf 3
+        tput setaf $PROMPT_TPUT
         read -rsp '>>> Press any key to continue...' -n 1 key
-        tput setaf 2
+        tput setaf $DEFAULT_TPUT
 
         # ensure that any parameters entered are valid
         validate_usr_input
@@ -95,21 +98,20 @@ main() {
 }
 
 disp_enabled_xcode_version() {
-    tput setaf 3
+    tput setaf $PROMPT_TPUT
     echo ">>> Current enabled Xcode version: "
     tput sgr0
     xcode-select -p
-    tput setaf 3
+    tput setaf $PROMPT_TPUT
     echo ">>> Current Swift version: "
     tput sgr0
     swift -version
 }
 
 validate_usr_input() {
-    tput setaf 2
+    tput setaf $DEFAULT_TPUT
     echo ""
     echo ">>> validating input parameters..."
-    tput sgr0
 
     if [ $# -ne 0 ]; then
         if [ ${NUM_PARAMETERS} -eq 1 ]; then
@@ -135,12 +137,12 @@ validate_usr_input() {
                         return
                     else
                         VALID_INPUT=true
+                        HAS_PARAM=true
+
                         if [ "${USR_PARAM}" == "y" ]; then
-                            VALID_INPUT=true
                             USE_BETA=true
                             return
                         elif [ "${USR_PARAM}" == "n" ]; then
-                            VALID_INPUT=true
                             USE_BETA=false
                             return
                         fi
@@ -153,15 +155,14 @@ validate_usr_input() {
         fi
     fi
 
-    tput setaf 2
     echo ">>> no parameters specified"
-    tput sgr0
 
-    tput setaf 3
+    tput setaf $PROMPT_TPUT
     read -rp '>>> Enable Xcode beta? (y/n): ' -n 1 key
     tput sgr0
+    
     USR_PARAM="$key"
-    tput setaf 2
+    tput setaf $DEFAULT_TPUT
 
     if [ ${HAS_PARAM} == false ]; then
         if [ "${USR_PARAM}" != "y" ] && [ "${USR_PARAM}" != "n" ]; then
@@ -180,17 +181,16 @@ validate_usr_input() {
     fi
 
     if [ ${VALID_INPUT} == true ]; then
-        tput setaf 2
         echo ""
         echo ">>> User input validated successfully"
-        tput sgr0
     fi
+
+    tput sgr0
 }
 
 assign_xcode_title() {
-    tput setaf 2
+    tput setaf $DEFAULT_TPUT
     echo ">>> Assigning title..."
-    tput sgr0
     
     if [ ${VALID_INPUT} == true ]; then
         if [ ${USE_BETA} == true ]; then
@@ -199,40 +199,33 @@ assign_xcode_title() {
             USR_XCODE_TITLE=${XCODE_TITLE}
         fi
         
-        tput setaf 2
         echo ">>> Title successfully assigned --> \"${USR_XCODE_TITLE}\""
-        tput sgr0
     else
         USR_ERR="Invalid input. Please enter a valid option"
         prompt_usr_err
-        return
     fi
+
+    tput sgr0
 }
 
 prompt_usr_err() {
     if [ "${USR_ERR}" != "" ]; then
-        tput setaf 1
+        tput setaf $ERR_TPUT
         echo "ERROR: ${USR_ERR}"
-        tput sgr0
+        tput setaf $DEFAULT_TPUT
 
         if [ ${EXECUTE_CMD} == true ]; then
-            tput setaf 2
             echo "Restarting procedure"
-            tput sgr0
-            main
         else
-            tput setaf 2
             echo "Terminating operation"
-            tput sgr0
-            main
         fi
 
-        tput setaf 2
+        init
     fi
 }
 
 enable_xcode_version() {
-    tput setaf 2
+    tput setaf $DEFAULT_TPUT
     echo ">>> This command may need root/administrative privelages in order to be executed..."
 
     # check for admin permisisons
@@ -247,26 +240,24 @@ enable_xcode_version() {
         sudo $USER xcode-select -s /Applications/Xcode.app/Contents/Developer
     fi
 
-    tput setaf 6
+    tput setaf $HEADER_TPUT
     echo ">>> Command executed successfully"
     tput sgr0
 
     EXECUTE_CMD=false
-    main
+    init
 }
 
 trap_ctrlc() {
-    tput setaf 2
+    tput setaf $DEFAULT_TPUT
     echo ""
     echo ">>> Cleaning..."
-    tput sgr0
     clean_stdin
-    tput setaf 2
     echo ">>> Cleaned successfully"
-    tput sgr0
-    tput setaf 2
     echo ">>> Exiting application"
     tput sgr0
+
+    # end script
     exit 2
 }
 
@@ -276,8 +267,10 @@ clean_stdin() {
     #done
 }
 
+# captures 'ctrl-c' keycode and exits the program appropriately instead of halting
 trap trap_ctrlc 2
 
-main
+# initializes the program
+init
 
 
