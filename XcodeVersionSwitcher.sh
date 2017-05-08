@@ -34,6 +34,8 @@ PROMPT_TPUT=3
 HAS_XCODE=false
 HAS_XCODE_BETA=false
 HAS_XCODE_VERSIONS=false
+ERR_XCODE_BETA_NOT_FOUND="The required Xcode beta was not found on this computer"
+ERR_XCODE_NOT_FOUND="The required standard (non-beta) installation of Xcode was not found on this computer"
 
 
 init() {
@@ -66,7 +68,7 @@ init() {
                 INVALID_CONT_OPTION=false
             else
                 USR_ERR="Invalid input--please select a valid option"
-                prompt_usr_err
+                disp_usr_err
                 INVALID_CONT_OPTION=true
             fi
 
@@ -87,7 +89,7 @@ init() {
             assign_xcode_title
             enable_xcode_version
         else
-            prompt_usr_err
+            disp_usr_err
         fi
     done
 }
@@ -107,16 +109,16 @@ scan_drive_for_xcode_versions() {
         HAS_XCODE=true
         HAS_XCODE_BETA=false
         HAS_XCODE_VERSIONS=false
-        USR_ERR=">>> The required Xcode beta was not found on this computer"
+        USR_ERR=ERR_XCODE_BETA_NOT_FOUND
     elif [ -d ${DEFAULT_XCODE_BETA_APP} ]; then
         HAS_XCODE=false
         HAS_XCODE_BETA=true
         HAS_XCODE_VERSIONS=false
-        USR_ERR">>> The required standard (non-beta) installation of Xcode was not found on this computer"
+        USR_ERR=ERR_XCODE_NOT_FOUND
     fi
 
     EXECUTE_CMD=false
-    prompt_usr_err  # shows error and exits execution due to missing required software
+    disp_usr_err  # shows error and exits execution due to missing required software
 }
 
 disp_enabled_xcode_version() {
@@ -155,7 +157,7 @@ validate_usr_input() {
                         HAS_PARAM=false
                         USR_ERR="Invalid parameter specifications. Please enter a valid option"
                         VALID_INPUT=false
-                        prompt_usr_err
+                        disp_usr_err
                         return
                     else
                         VALID_INPUT=true
@@ -173,7 +175,7 @@ validate_usr_input() {
             fi
         else
             USR_ERR="Invalid number of parameters"
-            prompt_usr_err
+            disp_usr_err
         fi
     fi
 
@@ -198,7 +200,7 @@ validate_usr_input() {
             USE_BETA=false
         else
             USR_ERR="An unknown error occurred"
-            prompt_usr_err
+            disp_usr_err
         fi
     fi
 
@@ -224,13 +226,13 @@ assign_xcode_title() {
         echo ">>> Title successfully assigned --> \"${USR_XCODE_TITLE}\""
     else
         USR_ERR="Invalid input. Please enter a valid option"
-        prompt_usr_err
+        disp_usr_err
     fi
 
     tput sgr0
 }
 
-prompt_usr_err() {
+disp_usr_err() {
     if [ "${USR_ERR}" != "" ]; then
         tput setaf $ERR_TPUT
         echo "ERROR: ${USR_ERR}"
@@ -240,6 +242,7 @@ prompt_usr_err() {
             echo "Restarting procedure"
         else
             echo "Terminating operation"
+            terminate
         fi
 
         init
@@ -287,6 +290,11 @@ clean_stdin() {
     #while [ read -r -t 0 ]; do
     #    read -n 256 -r -s
     #done
+}
+
+terminate() {
+    clean_stdin
+    exit 1
 }
 
 # captures 'ctrl-c' keycode and exits the program appropriately instead of halting
