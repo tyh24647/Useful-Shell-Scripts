@@ -4,6 +4,9 @@
 # GoServer allows for simple server connections by creating the GoServer
 # command.
 #
+# This specific command helps with my current job, however the server names
+# can be modified to your liking to connect you to network servers.
+#
 # Tyler Hostager
 # 5/1/15
 #############################################################################
@@ -11,7 +14,7 @@
 
 
 ## Init local vars
-ROOT_USER="tyh24647"		# 	<-- Assign root user to tyh24647-to be changed per user
+ROOT_USER="$USER"		# 	<-- Should automatically detect username, but modify if not
 SERVER_TITLE=""
 SPECIFICATIONS=""
 SERVER_ADDRESS=""
