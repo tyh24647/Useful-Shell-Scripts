@@ -80,3 +80,8 @@ BASH AND SHELL SCRIPTS
         enter. This will give you read and write permissions for the document.
 
 
+* Recommended additional installations:
+    - zsh
+    - oh my zsh
+    - homebrew
+    

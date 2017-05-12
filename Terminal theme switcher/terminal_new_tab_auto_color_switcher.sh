@@ -64,20 +64,25 @@ verify_directory() {
 prompt_usr_err() {
     error_message=""
     max_num_args=2
+    num_args=$#
 
-    if [ $ERR_MSG -eq "" ]; then
-        if [ $# -gt 0 ]; then
-            for msg in "$@"; do
-                error_message=$error_message+=$"msg"
-            done
+    if [ -z "$1" ]; then
+        # no arguments supplied. check for saved error message
+
+        if [ $ERR_MSG -eq "" ]; then
+            if [ $# -gt 0 ]; then
+                for msg in "$@"; do
+                    error_message=$error_message+=$"msg"
+                done
+            else
+                return
+            fi
         else
-            return
+            error_message=$ERR_MSG
         fi
-    else
-        error_message=$ERR_MSG
-    fi
 
-    printf $"> ERROR: $error_msg"
+        printf $"> ERROR: $error_msg"
+    fi
 }
 
 main
