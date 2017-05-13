@@ -34,9 +34,7 @@ delete_system_sleep_image() {
         
         output_colored "Sleepimage file removed successfully" $GREEN
     else
-        tput setaf $RED
-        echo "Error: File not found in the specified directory."
-        tput sgr0
+        output_colored "Error: File not found in the specified directory." $RED
         echo "Skipping procedure..."
     fi
 }
