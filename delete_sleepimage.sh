@@ -25,16 +25,14 @@ delete_system_sleep_image() {
     # check for sleepimage file in default location
     if [ -f /private/var/vm/sleepimage ]; then
         output_colored "Sleepimage detected" $YELLOW
+        
         echo "Deleting 'sleepimage'..."
         echo "Please enter your password..."
         {
             sudo rm -rf /private/var/vm/sleepimage
         } &> /dev/null
         
-        #echo "Deleting 'sleepimage'...`sudo rm -rf /private/var/vm/sleepimage`"
-        tput setaf $GREEN
-        echo "Sleepimage removed successfully"
-        tput sgr0
+        output_colored "Sleepimage file removed successfully" $GREEN
     else
         tput setaf $RED
         echo "Error: File not found in the specified directory."
