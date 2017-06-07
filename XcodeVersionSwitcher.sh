@@ -42,7 +42,23 @@ init() {
     if [ ${NUM_RUNS} -eq 0 ]; then
         clear
         tput setaf $HEADER_TPUT
-        echo ">>>  XCODE VERSION SELECTOR"
+        echo ""
+        echo ""
+        echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+        echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+        echo ">>>"
+        echo ">>>"
+        echo ">>>"
+        echo ">>>            ** XCODE VERSION SELECTOR **"
+        echo ">>>"
+        echo ">>>"
+        echo ">>>  (c) Tyler Hostager, 2017."
+        echo ">>>  All Rights Reserved."
+        echo ">>>"
+        echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+        echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+        echo ""
+        echo ""
         tput sgr0
     fi
 
@@ -247,6 +263,8 @@ disp_usr_err() {
 
         init
     fi
+
+    tput srg0
 }
 
 enable_xcode_version() {
@@ -294,6 +312,7 @@ clean_stdin() {
 
 terminate() {
     clean_stdin
+    tput sgr0  #    <-- reset tput
     exit 1
 }
 
