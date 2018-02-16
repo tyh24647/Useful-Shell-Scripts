@@ -48,7 +48,7 @@ zsh-theme-switcher() {
 
     debug_log "\n>>> ZSH THEME SWITCHER"
     
-    local OPTIND options
+    local OPTIND option
     while getopts ":default:verbose:name:path:random:help:tyler:help:d:v:n:p:r:t:h:" option; do
         case "$option" in
 
