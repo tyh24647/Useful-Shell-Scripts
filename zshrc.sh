@@ -1,4 +1,6 @@
+#!/bin/sh
 # ~/.zshrc: executed by zsh(1) for non-login shells.
+
 
 if [ -f ~/.bashrc ]; then
     . ~/.bashrc
