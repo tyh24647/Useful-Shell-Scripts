@@ -1,42 +1,54 @@
 #!/bin/bash
-THEME_SWITCHER_IS_VERBOSE=0
 
-alias ty-custom-terminal-theme='osascript ~/Desktop/Useful\ Scripts/Terminal\ theme\ switcher/bin/TermTheme.scpt /Users/tyhostager/Desktop/Useful\ Scripts/Terminal\ theme\ switcher/Terminal\ Customizations/tyler.zsh-theme'
-alias ty-zsh-theme='~/Desktop/Useful\ Scripts/Terminal\ theme\ switcher/Terminal\ Customizations/tyler.zsh-theme'
+####
+# ALIASES
 alias zsh-theme-switcher=zsh-theme-switcher
 
+####
+# GLOBAL VARS
+THEME_SWITCHER_IS_VERBOSE=0
+
+####
+# HELPER METHODS
 zsh-theme-switcher() {
-    debug_log "\n>>> ZSH THEME SWITCHER"
-    VAR1=""
-    VAR2=""
-    NUM_VARS=$#
+    local VAR1=""
+    local VAR2=""
+    local NUM_VARS=$#
 
     if [ $# -gt 0 ]; then
+
         if [[ $# -ge 1 ]] && ( [[ "$1" = "-v" ]] || [[ "$1" = "--verbose" ]] ); then
+            THEME_SWITCHER_IS_VERBOSE=1
             VAR1=$2
             VAR2=""
         elif [[ "$1" = "--help" ]] || [[ "$1" = "-h" ]]; then
-            THEME_SWITCHER_IS_VERBOSE=1
+            THEME_SWITCHER_IS_VERBOSE=1     # must be verbose to show help options
 
             if [ $# -gt 2 ]; then
                 VAR1="$2"
+                
                 if [ $# -eq 3 ]; then
                     VAR2="$3"
                 fi
             else
                 VAR1="$1"
+
                 if [ $# -eq 2 ]; then
                     VAR2="$2"
                 fi
             fi
         else
             VAR1="$1"
+
             if [ $# -gt 1 ]; then
                 VAR2="$2"
             fi
         fi
     fi
+
+    debug_log "\n>>> ZSH THEME SWITCHER"
     
+    local OPTIND options
     while getopts ":default:verbose:name:path:random:help:tyler:help:d:v:n:p:r:t:h:" option; do
         case "$option" in
 
@@ -76,7 +88,8 @@ zsh-theme-switcher() {
                         
                         debug_log ">>> Assigning theme name..."
                         {
-                            theme="${VAR2^^}"
+                            theme="$VAR2" | tr '[:upper:]' '[:lower:]'
+                            #theme="${VAR2^^}"
                             sleep_verbose 2
                             debug_log ">>> Name successfully assigned!"
                         } &> /dev/null
@@ -99,7 +112,7 @@ zsh-theme-switcher() {
                             debug_log ">>> Parsing file name to 'TerminalSwitcher.scpt' format ..."
                             echo -e ""
                             {
-                                TMP_FILE_NAME=s$(ed -e 's//\(.*\).zsh-theme/\1/')
+                                TMP_FILE_NAME=$(sed -e 's//\(.*\).zsh-theme/\1/')
                                 sleep_verbose 2
                             } &> /dev/null
                             
@@ -119,7 +132,8 @@ zsh-theme-switcher() {
                             debug_log ">>> Theme file already exists"
                             debug_log ">>> applying existing theme..."
                             {
-                                theme="${TMP_FILE_NAME^^}"
+                                theme="$TMP_FILE_NAME" | tr '[:upper:]' '[:lower:]'
+                                #theme="${TMP_FILE_NAME^^}"
                                 sleep_verbose 2
                                 debug_log ">>> Theme applied successfully!"
                             } &> /dev/null
@@ -163,7 +177,7 @@ zsh-theme-switcher() {
             v) THEME_SWITCHER_IS_VERBOSE=1 ;;
 
             n) {
-                if [[ $VAR2 = *"~/"* ]] || [[ $VAR2 = *"/"* ]]; then
+                if [[ $VAR2 = *"~/"* ]] && [[ $VAR2 = *"/"* ]]; then
                     TMP_FILE_NAME="${VAR2,,}"     # convert to lowercase to check for theme file name
 
                     if [[ -f "~/.oh-my-zsh/themes/${TMP_FILE_NAME}.zsh-theme" ]]; then      # check if theme file with the specified name exists
@@ -185,7 +199,8 @@ zsh-theme-switcher() {
                         
                         debug_log ">>> File replaced successfully!"
                         {
-                            theme="${VAR2^^}"
+                            theme="$VAR2" | tr '[:upper:]' '[:lower:]'
+                            #theme="${VAR2^^}"
                             sleep_verbose 1
                         } &> /dev/null
                     else
@@ -230,14 +245,16 @@ zsh-theme-switcher() {
                             debug_log ">>> Theme file already exists"
                             debug_log ">>> applying existing theme..."
                             {
-                                theme="${TMP_FILE_NAME^^}"
+                                theme="$TMP_FILE_NAME" | tr '[:upper:]' '[:lower:]'
+                                #theme="${TMP_FILE_NAME^^}"
                                 sleep_verbose 2
                                 debug_log ">>> Theme applied successfully!"
                             } &> /dev/null
                         else 
                             debug_log ">>> Copying file from the specified path to the 'zsh' themes directory at path '~/.oh-my-zsh/themes/'..."
                             {
-                                cp ${VAR2,,} ~/.oh-my-zsh/themes
+                                cp $VAR2 ~/.oh-my-zsh/themes
+                                #cp ${VAR2,,} ~/.oh-my-zsh/themes
                                 sleep_verbose 4
 
                                 if [ -f ~/.oh-my-zsh/themes/${TMP_FILE_NAME,,}.zsh-theme ]; then
@@ -291,7 +308,7 @@ zsh-theme-switcher() {
                     } &> /dev/null
                 elif [ $# -gt 1 ]; then
                     if [ $THEME_SWITCHER_IS_VERBOSE=0 ]; then
-                        CUSTOM_ARG_NAME="$VAR1"
+                        CUSTOM_ARG_NAME="$VAR1" | tr '[:lower:]' '[:upper:]'
                         
                         if [ $# -eq 2 ]; then
                             if [[ $option = *"-n"* ]] || [[ $option = *"--name"* ]]; then
@@ -300,7 +317,7 @@ zsh-theme-switcher() {
                                     sleep_verbose 3
                                 } &> /dev/null
                                 
-                                if [[ ! -f "~/.oh-my-zsh/themes/${$VAR1,,}.zsh-theme" ]]; then
+                                if [[ ! -f "~/.oh-my-zsh/themes/${$,,}.zsh-theme" ]]; then
                                     debug_log ">>> ERROR: File not found at path '~/.oh-my-zsh/themes/${$VAR1,,}.zsh-theme'"
                                     debug_log ">>> Skipping procedure..."
                                     {
@@ -309,7 +326,7 @@ zsh-theme-switcher() {
                                 fi
 
                                 debug_log ">>> Parsing and formatting theme name ..."; {
-                                    theme="${VAR1^^}"
+                                    theme="$VAR1" | tr '[:upper:]' '[:lower:]'
                                 }
                             fi
                         else
@@ -328,9 +345,8 @@ zsh-theme-switcher() {
 
                     if [ -f $TMP_FILE_NAME ]; then
                         debug_log "Loading theme file named '${VAR1}'..."
-                        {
-                            theme="${option,,}"
-                        } &> /dev/null
+                        theme="${option,,}"
+
                     else
                         debug_log ">>> "
                         debug_log ">>> ERROR: Unable to load theme file - File not found"
@@ -346,14 +362,16 @@ zsh-theme-switcher() {
         esac
     done
 
-    debug_log ">>> Applying theme '${VAR1}' ..."; {
-        sleep_verbose 2
-        osascript ~/Desktop/Useful\ Scripts/Terminal\ theme\ switcher/bin/TermTheme.scpt ${VAR1}
-    } &> /dev/null
+    if [ $THEME_SWITCHER_IS_VERBOSE=1 ]; then
+        debug_log ">>> Applying theme '${VAR1}' ..."    
+    fi
+
+    sleep_verbose 2
+    osascript ~/Desktop/Useful\ Scripts/Terminal\ theme\ switcher/bin/TermTheme.scpt ${VAR1}
 
     debug_log ">>> Theme successfully applied!"
-    debug_log "The command completed successfully with exit code: 0."
     debug_log ""
+    debug_log "The command completed successfully with exit code: 0."
     debug_log ""; {
         VAR1=""
         VAR2=""
@@ -368,7 +386,7 @@ function debug_log() {
     fi
 }
 
-function verbose_sleep() {
+function sleep_verbose() {
     if [ $THEME_SWITCHER_IS_VERBOSE -eq 1 ]; then
         sleep $1
     fi
